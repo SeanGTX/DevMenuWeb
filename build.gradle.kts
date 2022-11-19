@@ -1,5 +1,3 @@
-
-
 plugins {
     kotlin("multiplatform") version "1.7.10"
     application
@@ -34,13 +32,22 @@ kotlin {
             }
         }
     }
+
+    //TODO разобраться с бардаком в версиях зависимостей
     sourceSets {
+
+        val ktorVersion = "2.0.1"
+
         val commonMain by getting {
 
             dependencies {
 
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:+")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:+")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:+")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
             }
 
@@ -48,10 +55,9 @@ kotlin {
         val jvmMain by getting {
 
             dependencies {
-
-                val ktorVersion = "2.0.1"
                 val slf4jVersion = "1.7.5"
 
+                compileOnly(files("D:/Projects/JavaProjects/AndroidEGL_for_Ktor/build/libs/AndroidEGL_for_Ktor-1.0-SNAPSHOT.jar"))
                 implementation("io.ktor:ktor-server-cio:$ktorVersion")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
@@ -105,6 +111,8 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "ru.megboyzz.application.ServerKt"
     }
+    
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(configurations.compileClasspath.map { config -> config.map { if (it.isDirectory) it else zipTree(it) } })
+    exclude("")
 }

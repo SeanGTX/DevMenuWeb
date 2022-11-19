@@ -2,14 +2,22 @@ package ru.megboyzz.application
 
 import entities.Element
 import entities.Folder
+import entities.GameLanguage
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.nio.charset.Charset
 import java.util.*
 
 //Реализация для ПК
-class PlatformImpl : PlatformAPI {
+class PlatformImpl(language: GameLanguage) : PlatformAPI {
+
+    private var language = language
+
 
     private val File.size
     get() =
@@ -27,14 +35,15 @@ class PlatformImpl : PlatformAPI {
     private val File.sizeInMb get() = sizeInKb / 1024
     private val File.sizeInGb get() = sizeInMb / 1024
 
-    override fun open(path: String, basePath: String) {
-        TODO("Not yet implemented")
+    override fun openFile(path: String, basePath: String) : File {
+        val file = File(basePath + path)
+        if(!file.exists()) throw FileNotFoundException()
+        return file
     }
 
     override fun getFile(path: String, basePath: String): Folder {
-        val file = File(basePath + path);
+        val file = File(basePath + path)
         if(!file.exists()) throw FileNotFoundException()
-
         val subFolders = emptyList<String>().toMutableList()
         val subFiles = emptyList<String>().toMutableList()
 
@@ -78,5 +87,32 @@ class PlatformImpl : PlatformAPI {
 
     }
 
+    //TODO реализовать язык
+    override fun setLanguage(language: GameLanguage) {
+        //Так как на пк язык не нужен так то, просто будем дергать переменную)
+        this.language = language
+    }
 
+    //TODO реализовать язык
+    override fun getLanguage(): GameLanguage {
+        return language
+    }
+
+    override fun isFile(path: String, basePath: String) : Boolean {
+        return File(basePath + path).isFile
+    }
+
+    override fun createFile(path: String, basePath: String) {
+        val file = File(basePath + path)
+        if(file.exists()) throw Exception()
+        file.createNewFile()
+    }
+
+    override fun saveFile(path: String, basePath: String, fileInputStream: InputStream) {
+        val file = File(basePath + path)
+        if(!file.exists()) throw FileNotFoundException()
+        val fos = FileOutputStream(file)
+        fileInputStream.copyTo(fos)
+        fos.write(byteArrayOf())
+    }
 }
