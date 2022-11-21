@@ -1,4 +1,4 @@
-package ru.megboyzz.application
+package ru.megboyzz.api
 
 import entities.Element
 import entities.Folder
@@ -13,27 +13,9 @@ import java.io.InputStream
 //TODO разделить этот интефейс на отдельные части для не опущения загромаждения
 // файла с итерфейсом, а в следствии и файла реализующего этот интерфейс
 interface PlatformAPI {
-    // basePath - показывает откуда идти (EXTERNAL, INTERNAL)
-    fun openFile(path: String, basePath: String) : File
-
-    fun getFile(path: String, basePath: String): Folder
-
-    fun removeFile(path: String, basePath: String)
-
-    fun createFile(path: String, basePath: String)
-
-    fun saveFile(path: String, basePath: String, fileInputStream: InputStream)
-
-    fun isFile(path: String, basePath: String) : Boolean
 
     fun shutdown()
 
     fun getNextLogLine(): String
-
-    fun getInfo(path: String, basePath: String): Element
-
-    fun setLanguage(language: GameLanguage)
-
-    fun getLanguage() : GameLanguage
 
 }

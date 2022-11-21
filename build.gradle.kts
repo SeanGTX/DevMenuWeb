@@ -114,5 +114,5 @@ tasks.withType<Jar> {
     
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(configurations.compileClasspath.map { config -> config.map { if (it.isDirectory) it else zipTree(it) } })
-    exclude("")
+    exclude("ru.megboyzz.api.impl")
 }
