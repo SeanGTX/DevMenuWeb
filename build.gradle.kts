@@ -57,7 +57,6 @@ kotlin {
             dependencies {
                 val slf4jVersion = "1.7.5"
 
-                compileOnly(files("D:/Projects/JavaProjects/AndroidEGL_for_Ktor/build/libs/AndroidEGL_for_Ktor-1.0-SNAPSHOT.jar"))
                 implementation("io.ktor:ktor-server-cio:$ktorVersion")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")

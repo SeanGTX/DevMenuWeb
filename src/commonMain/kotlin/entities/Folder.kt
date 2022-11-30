@@ -17,5 +17,6 @@ data class Element(
     val basePath: String,
     val path: String,
     val size: Long,
-    val dateOfChange: Instant
+    val dateOfChange: Instant,
+    val replacementId: Int //Указывает на то что файл заменен или нет(-1 -> нет замены)
 )

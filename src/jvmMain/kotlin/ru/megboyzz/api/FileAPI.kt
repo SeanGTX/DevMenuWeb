@@ -6,7 +6,6 @@ import java.io.File
 import java.io.InputStream
 
 interface FileAPI {
-    // basePath - показывает откуда идти (EXTERNAL, INTERNAL)
     
     fun openFile(path: String) : File
 
