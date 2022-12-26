@@ -180,12 +180,21 @@ fun start(port: Int, factory: ApiFactory, internalPath: String, externalPath: St
                     route("/replacement"){
                         val replacementsAPI = apiFactory.createReplacementsAPI()
                         post {
-                            val replacement = call.receive<Replacement>()
-                            replacementsAPI.addReplacement(replacement)
+                            kotlin.runCatching {
+                                val replacement = call.receive<Replacement>()
+                                replacementsAPI.addReplacement(replacement)
+                            }
+                                .onFailure {
+                                    println(it)
+                                    call.respond(HttpStatusCode.BadRequest)
+                                }
+                                .onSuccess { call.respond(HttpStatusCode.OK) }
                         }          // Добавление замены
                         delete {
+                            if(!call.containsParam("id")) call.respond(HttpStatusCode.BadRequest)
                             val params = call.getParams("id")
                             replacementsAPI.recoverReplacementByID(params!!.toInt())
+                            call.respond(HttpStatusCode.OK)
                         }       // Воосталение замены
                         route("/all"){
                             get {
@@ -194,6 +203,7 @@ fun start(port: Int, factory: ApiFactory, internalPath: String, externalPath: St
                             }       // Получить список всех замен
                             delete {
                                 replacementsAPI.recoverAllReplacements()
+                                call.respond(HttpStatusCode.OK)
                             }   // Воостановить все
                         }
                     }
@@ -210,6 +220,7 @@ fun start(port: Int, factory: ApiFactory, internalPath: String, externalPath: St
                             val channel = call.request.receiveChannel()
                             println("channel is " + channel.availableForRead)
                             options.setSaveFile(channel.readRemaining().inputStream())
+                            call.respond(HttpStatusCode.OK)
                         }
                     }
 
@@ -223,8 +234,10 @@ fun start(port: Int, factory: ApiFactory, internalPath: String, externalPath: St
                             call.respond(options.getSaveTrackingInfo())
                         }
                         post{
-                            val info = call.receive<SaveTrackingInfo>()
-                            options.setSaveTrackingInfo(info)
+                            call.receive<SaveTrackingInfo>()
+                                .runCatching { options.setSaveTrackingInfo(this) }
+                                .onSuccess { call.respond(HttpStatusCode.OK) }
+                                .onFailure { call.respond(HttpStatusCode.BadRequest) }
                         }
 
                     } //TODO сделать отслеживание файла
