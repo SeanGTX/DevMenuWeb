@@ -14,7 +14,8 @@ interface OptionsAPI {
     fun getSaveTrackingInfo(): SaveTrackingInfo
 
     /**
-     * В сеттере используется InputStream потому что мы отправляем не ссылки на файлы а содержимое файла
+     * В сеттере используется InputStream потому что мы отправляем не ссылки на файлы а содержимое файла<br>
+     * В геттере используется файл потому что ktor умеет отправлять файлы как java.io.File
      */
     fun setSaveFile(save: InputStream)
 
