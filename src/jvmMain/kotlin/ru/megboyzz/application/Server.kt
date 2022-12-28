@@ -2,6 +2,7 @@ package ru.megboyzz.application
 
 import entities.GameLanguage
 import entities.Replacement
+import entities.SVMW
 import entities.SaveTrackingInfo
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -218,7 +219,6 @@ fun start(port: Int, factory: ApiFactory, internalPath: String, externalPath: St
                         }
                         post{
                             val channel = call.request.receiveChannel()
-                            println("channel is " + channel.availableForRead)
                             options.setSaveFile(channel.readRemaining().inputStream())
                             call.respond(HttpStatusCode.OK)
                         }
@@ -243,11 +243,48 @@ fun start(port: Int, factory: ApiFactory, internalPath: String, externalPath: St
                     } //TODO сделать отслеживание файла
 
                     route("/svmw"){
-                        post{
+
+                        val svmwAPI = apiFactory.createSvmwAPI()
+
+                        //Получение информации о svmw файле
+                        post("/info"){
+                            val channel = call.request.receiveChannel()
+                            runCatching {
+                                val info = svmwAPI.getInfoAboutSvmw(channel.readRemaining().inputStream())
+                                call.respond(info)
+                            }
+                                .onFailure {
+                                    print(it)
+                                    call.respond(HttpStatusCode.BadRequest)
+                                }
 
                         }
-                        get{
 
+                        //Загрузить новый svmw в сохранение
+                        post("/load"){
+                            val channel = call.request.receiveChannel()
+                            runCatching {
+                                svmwAPI.setSVMWasSaveFile(channel.readRemaining().inputStream())
+                            }
+                                .onFailure { call.respond(HttpStatusCode.BadRequest) }
+                                .onSuccess { call.respond(HttpStatusCode.OK) }
+
+                        }
+
+                        //Получить текущий загруженный в игру svmw
+                        get("/upload") {
+                            call.respond(svmwAPI.getLoadedSVMW())
+                        }
+
+                        //Создать новый svmw из текущего файла сохранения
+                        post{
+                            val receive = call.receive<SVMW>()
+                            call.respond(svmwAPI.createSVMWfromCurrentSave(receive))
+                        }
+
+                        //Получить информацию о текущем загруженном svmw
+                        get{
+                            call.respond(svmwAPI.getInfoAboutLoadedSVMW())
                         }
                     }
                 }
